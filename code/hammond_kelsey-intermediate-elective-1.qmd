@@ -4,24 +4,60 @@ author: "Kelsey Hammond"
 date: "05-22-2026"
 format: pdf
 ---
+# Problems
+## 1. Explain your inspiration
 
-## Quarto
+I chose Cédric Scherer’s “Bill Dimensions of Brush-tailed Penguins”. This visualization makes sense for my dataset because I am exploring the relationship between waterfowl species abundance and water salinity and they are both quantitative variables. The x-axis will be salinity and the y-axis will be waterfowl abundance.
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## 2. Plan your figure
 
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+## 3. Code your figure
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.showtext = T, fig.retina = 1)
 ```
 
-You can add options to executable code like this 
+```{r prep, message=FALSE}
+## packages
+library(tidyverse)
+library(colorspace)
+library(ragg)
+library(cowplot)
+library(ggtext)
+library(pdftools)
 
-```{r}
-#| echo: false
-2 * 2
+theme_set(theme_minimal(base_size = 15, base_family = "Neutraface Slab Display TT Bold"))
+
+theme_update(
+  panel.grid.major = element_line(color = "grey92", size = .4),
+  panel.grid.minor = element_blank(),
+  axis.title.x = element_text(color = "grey30", margin = margin(t = 7)),
+  axis.title.y = element_text(color = "grey30", margin = margin(r = 7)),
+  axis.text = element_text(color = "grey50"),
+  axis.ticks =  element_line(color = "grey92", size = .4),
+  axis.ticks.length = unit(.6, "lines"),
+  legend.position = "top",
+  plot.title = element_text(hjust = 0, color = "black", 
+                            family = "Neutraface 2 Display Titling",
+                            size = 21, margin = margin(t = 10, b = 35)),
+  plot.subtitle = element_text(hjust = 0, face = "bold", color = "grey30",
+                               family = "Neutraface Text Book Italic", 
+                               size = 14, margin = margin(0, 0, 25, 0)),
+  plot.title.position = "plot",
+  plot.caption = element_text(color = "grey50", size = 10, hjust = 1,
+                              family = "Neutraface Display Medium", 
+                              lineheight = 1.05, margin = margin(30, 0, 0, 0)),
+  plot.caption.position = "plot", 
+  plot.margin = margin(rep(20, 4))
+)
+
+pal <- c("#FF8C00", "#A034F0", "#159090")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+```{r}
+#| label: data
+
+water_quality <- read.csv(here("data", "YSI_Data_Begin_1.csv"))
+birds <- read.csv(here("data", "birds.csv")) |> filter(e_bird_group %in% c("Waterfowl", "Shorebirds", "Herons, Ibis, and Allies"))
+venoco_water <- read.csv(here("data", "venoco-water.csv"))
+```
+
